@@ -30,7 +30,7 @@ jobs:
           app=app-devops-sura-vscode-jah-dev
           sku=S1
           image=bencdr/code-server-azure
-          repo=https://github.com/daniel6omez/devops-course.git
+          repo=https://github.com/jaherrerag/devops.git
           az configure --defaults group=$group location=$location
           az appservice plan create --name $plan --is-linux --sku $sku
           az webapp create --plan $plan --name $app --deployment-container-image-name $image
