@@ -24,11 +24,11 @@ jobs:
 
       # Create the app service and vs code webapp
       - run: |
-          group=rg-devops-sura-jah-dev
+          group=rg-devops-sura-jah1-dev
           location=southcentralus
-          plan=plan-devops-sura-jah-dev
-          app=app-devops-sura-vscode-jah-dev
-          sku=S1
+          plan=plan-devops-sura-jah1-dev
+          app=app-devops-sura-vscode-jah1-dev
+          sku=P3V2
           image=bencdr/code-server-azure
           repo=https://github.com/jaherrerag/devops.git
           az configure --defaults group=$group location=$location
