@@ -28,7 +28,7 @@ jobs:
           location=southcentralus
           plan=plan-devops-sura-jah1-dev
           app=app-devops-sura-vscode-jah1-dev
-          sku=P3V2
+          sku=S1
           image=bencdr/code-server-azure
           repo=https://github.com/jaherrerag/devops.git
           az configure --defaults group=$group location=$location
