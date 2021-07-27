@@ -1,3 +1,63 @@
 pipeline {
+    agent any
 
+    environment {
+        REGISTRY_PASSWORD_1 = credentials('REGISTRY_PASSWORD_1')
+        group='rg-devops-sura-jah1-dev'
+        location='southcentralus'
+        registry='crdevopssurajahdev'
+        registry_url='https://crdevopssurajahdev.azurecr.io'
+        skuRegistry='Basic'
+        plan='plan-devops-sura-jah1-dev'
+        app='app-devops-sura-starter-jah1-dev'
+        image='crdevopssurajahdev.azurecr.io/starter:latest'
+    }
+
+    stages {
+        stage('Build ') {
+            steps {
+                //
+                echo 'Building'
+                sh 'sudo-apt-get update -y'
+                sh 'curl -sl https//aka/ms/InstallAzureCLIDeb | sudo bash'
+                nodejs(nodeJSInstallationName: 'Node 12.22.3') {
+                    sh 'rm -rf fe-devops-sura-jah1-dev'
+                    sh 'npx gatsby new fe-devops-sura-jah1-dev'
+                    sh 'npm run build --prefix fe-devops-sura-jah1-dev'
+                }
+            }
+        }
+        stage('Test') { 
+            steps {
+                // 
+                echo 'Testing'
+                nodejs(nodeJSInstallationName: 'Node 12.22.3') {
+                    sh 'npm run test-once --prefix fe-devops-sura-jah1-dev'
+                    sh 'npm run lint --prefix fe-devops-sura-jah1-dev'
+                }
+            }
+        }
+        stage('Deploy') {
+            steps {
+                //
+                echo 'Deploying'
+                withCredentials([azureServicePrincipal('eb34fc7c-1fb5-4cad-abcd-78c4c20a9239')]) {
+                  sh 'az login --service-principal -u $AZURE_CLIENT_ID -p $AZURE_CLIENT_SECRET -t $AZURE_TENTANT_ID'
+                  sh '''
+cat <<-EOF>> fe-devops-sura-jah1-dev/Dockerfile
+FROM nginx:stable-alpine
+COPY public /usr/share/nginx/html
+EXPOSE 80
+CMD ]"nginx", "-g", "daemon off"]
+EOF'''
+                    sh 'doker build -f fe-devops-sura-jah1-dev/dockerfile -t $image fe-devops-sura-jah1-dev'
+                    sh 'docker login $registry_url -u crdevopssurajahdev -p $REGISTRY_PASSWORD_1'
+                    sh 'docker push $image'
+                    sh 'az configure --defaults group=$group location=$location'
+                    sh 'az webapp create --plan $plan --name $app --development-container-image-name $image'
+                    sh 'az webapp config container set --name $app --docker-custom-image-name $image --docker-registry-server-url $registry_url'
+                }
+            }
+        }
+    }
 }
