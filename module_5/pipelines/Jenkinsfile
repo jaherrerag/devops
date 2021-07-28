@@ -5,12 +5,12 @@ pipeline {
         REGISTRY_PASSWORD_1 = credentials('REGISTRY_PASSWORD_1')
         group='rg-devops-sura-jah1-dev'
         location='southcentralus'
-        registry='crdevopssurajahdev'
-        registry_url='https://crdevopssurajahdev.azurecr.io'
+        registry='crdevopssurajah1dev'
+        registry_url='https://crdevopssurajah1dev.azurecr.io'
         skuRegistry='Basic'
         plan='plan-devops-sura-jah1-dev'
         app='app-devops-sura-starter-jah1-dev'
-        image='crdevopssurajahdev.azurecr.io/starter:latest'
+        image='crdevopssurajah1dev.azurecr.io/starter:latest'
     }
 
     stages {
@@ -51,7 +51,7 @@ EXPOSE 80
 CMD ]"nginx", "-g", "daemon off"]
 EOF'''
                     sh 'docker build -f fe-devops-sura-jah1-dev/Dockerfile -t $image fe-devops-sura-jah1-dev'
-                    sh 'docker login $registry_url -u crdevopssurajahdev -p $REGISTRY_PASSWORD_1'
+                    sh 'docker login $registry_url -u crdevopssurajah1dev -p $REGISTRY_PASSWORD_1'
                     sh 'docker push $image'
                     sh 'az configure --defaults group=$group location=$location'
                     sh 'az webapp create --plan $plan --name $app --development-container-image-name $image'
