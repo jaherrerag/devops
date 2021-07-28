@@ -42,7 +42,7 @@ pipeline {
                 //
                 echo 'Deploying'
                 withCredentials([azureServicePrincipal('0b7e2298-6466-47e3-8b0d-99c37b8c9cdc')]) {
-                  sh 'az login --service-principal -u $AZURE_CLIENT_ID -p $AZURE_CLIENT_SECRET -t $AZURE_TENTANT_ID'
+                  sh 'az login --service-principal -u $AZURE_CLIENT_ID -p $AZURE_CLIENT_SECRET -t $AZURE_TENANT_ID'
                   sh '''
 cat <<-EOF>> fe-devops-sura-jah1-dev/Dockerfile
 FROM nginx:stable-alpine
@@ -50,7 +50,7 @@ COPY public /usr/share/nginx/html
 EXPOSE 80
 CMD ]"nginx", "-g", "daemon off"]
 EOF'''
-                    sh 'doker build -f fe-devops-sura-jah1-dev/dockerfile -t $image fe-devops-sura-jah1-dev'
+                    sh 'docker build -f fe-devops-sura-jah1-dev/dockerfile -t $image fe-devops-sura-jah1-dev'
                     sh 'docker login $registry_url -u crdevopssurajahdev -p $REGISTRY_PASSWORD_1'
                     sh 'docker push $image'
                     sh 'az configure --defaults group=$group location=$location'
